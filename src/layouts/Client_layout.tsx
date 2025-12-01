@@ -1,12 +1,13 @@
 
 import { Outlet } from 'react-router-dom';
 
-function AdminLayouts() {
+
+function ClientLayouts() {
     return (
         <>
             <nav className="navbar navbar-expand-lg bg-info">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">Admin</a>
+                    <a className="navbar-brand" href="#">Client</a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -16,7 +17,7 @@ function AdminLayouts() {
                                 <a className="nav-link active" aria-current="page" href="#">Home</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#">Link</a>
+                                <a className="nav-link" href="#">Đăng ký</a>
                             </li>
                         </ul>
                         <form className="d-flex" role="search">
@@ -27,10 +28,10 @@ function AdminLayouts() {
                 </div>
             </nav>
 
-            <div className="container">
+            <div className="container mt-3">
                 <Outlet></Outlet>
             </div>
         </>
     )
 }
-export default AdminLayouts;
+export default ClientLayouts;
