@@ -1,12 +1,13 @@
 import { useState } from "react";
-import config from '../../config';
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../utils/appUtils.tsx";
+import { useNavigate } from "react-router-dom";
 
 
-const supabase = createClient(config.VITE_SUPABASE_URL, config.VITE_SUPABASE_PUBLISHABLE_KEY);
+
 function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');  
+    const navigate = useNavigate();
     async function registerUser() { {/*async la bat dong bo*/}
         if (!email || !password) {
             alert('Vui long nhap day du thong tin');
@@ -24,6 +25,7 @@ function Register() {
         }
         else {
             alert('Dang ky thanh cong.');
+            navigate('/dang_nhap');
         }
     }
     return (
