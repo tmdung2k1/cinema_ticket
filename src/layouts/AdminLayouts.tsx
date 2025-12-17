@@ -15,9 +15,12 @@ function AdminLayouts() {
                             <li className="nav-item">
                                 <a className="nav-link active" aria-current="page" href="#">Home</a>
                             </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">Link</a>
+                            <li>
+                                <a className="nav-link" href="#">Danh sách phòng</a>
                             </li>
+                            <li>
+                                <a className="nav-link" href="#">Login</a>
+                            </li>                        
                         </ul>
                         <form className="d-flex" role="search">
                             <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
