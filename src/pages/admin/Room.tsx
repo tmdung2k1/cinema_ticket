@@ -88,13 +88,8 @@ function Room() {
         }
     }
 
-    // Xóa nhiều phòng (duy nhất còn lại)
+    // Xóa nhiều phòng đã chọn
     async function deleteSelectedRooms() {
-        if (selectedIds.length === 0) {
-            alert("Vui lòng chọn ít nhất một phòng để xóa!");
-            return;
-        }
-
         if (!confirm(`Bạn có chắc muốn xóa ${selectedIds.length} phòng đã chọn?`)) return;
 
         const { error } = await supabase.from("rooms").delete().in("id", selectedIds);
@@ -124,20 +119,22 @@ function Room() {
     // Xử lý checkbox
     function toggleSelect(id: number) {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]//nếu đã chọn rồi thì bỏ chọn, chưa chọn thì thêm vào mảng
         );
     }
 
-    function toggleSelectAll() {
+    function toggleSelectAll() { //khi bấm vào checkbox này thì sẽ chọn hết hoặc bỏ chọn hết
         if (selectedIds.length === rooms.length && rooms.length > 0) {
             setSelectedIds([]);
         } else {
             setSelectedIds(rooms.map((r) => r.id));
         }
     }
-
-    useEffect(() => {
-        loadRooms();
+    // Load danh sách phòng khi component mount
+    useEffect(() => { //cu phap useEffect này để gọi hàm loadRooms khi component được render lần đầu tiên
+        (() => {
+            loadRooms();
+        })();
     }, []);
 
     return (
@@ -166,7 +163,7 @@ function Room() {
                                     <input
                                         type="checkbox"
                                         checked={selectedIds.length === rooms.length && rooms.length > 0}
-                                        onChange={toggleSelectAll}
+                                        onChange={toggleSelectAll}//khi bấm vào checkbox này thì sẽ chọn hết hoặc bỏ chọn hết
                                     />
                                 </th>
                                 <th>ID</th>
@@ -181,8 +178,8 @@ function Room() {
                                         Chưa có phòng nào
                                     </td>
                                 </tr>
-                            ) : (
-                                rooms.map((room) => (
+                            ) :
+                                (rooms.map((room) => (
                                     <tr key={room.id}>
                                         <td className="text-center">
                                             <input
@@ -205,7 +202,7 @@ function Room() {
                                         </td>
                                     </tr>
                                 ))
-                            )}
+                                )}
                         </tbody>
                     </table>
                 </div>
@@ -216,34 +213,35 @@ function Room() {
                 show={showModal}
                 onHide={closeModal}
                 headerText={modalMode === "add" ? "Thêm phòng mới" : "Cập nhật phòng"}>
-                <div className="mt-3">
-                    <label className="form-label fw-bold">Tên phòng</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={currentRoom.room_name}
-                        onChange={(e) =>
-                            setCurrentRoom({ ...currentRoom, room_name: e.target.value })
-                        }
-                        placeholder="Nhập tên phòng..."
-                        autoFocus //khi mo ra thì con trỏ tự động ở trong input
-                    />
-                </div>
-
-                <div className="mt-4 d-flex justify-content-end gap-2">
-                    <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                        Hủy
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={modalMode === "add" ? addRoom : updateRoom}>
-                        {modalMode === "add" ? "Thêm mới" : "Cập nhật"}
-                    </button>
-                </div>
+                <>
+                    <div className="mt-3">
+                        <label className="form-label fw-bold">Tên phòng</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={currentRoom.room_name}
+                            onChange={(e) =>
+                                setCurrentRoom({ ...currentRoom, room_name: e.target.value })//dau ... la de giu nguyen cac thuoc tinh khac cua currentRoom
+                            }
+                            placeholder="Nhập tên phòng..."
+                            autoFocus //khi mo ra thì con trỏ tự động ở trong input
+                        />
+                    </div>
+                    <div className="mt-4 d-flex justify-content-end gap-2">
+                        <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                            Hủy
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={modalMode === "add" ? addRoom : updateRoom}>
+                            {modalMode === "add" ? "Thêm mới" : "Cập nhật"}
+                        </button>
+                    </div>
+                </>
             </AppModal>
         </>
     );
 }
-
 export default Room;
+
