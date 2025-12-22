@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 import type { FilmType } from "../../types/film"
 import { supabase } from "../../utils/appUtils"
+import SelectGenre from "../../components/SelectGenre"
+import SelectRat from "../../components/SelectRating"
 
 
 function FilmUpsert() {
@@ -57,12 +59,17 @@ function FilmUpsert() {
                 <div className="mt-3">
                     <label className="form-label">Giới thiệu nội dung</label>
                     <input onChange={(ev) => setgioi_thieu_noi_dung(ev.target.value)} type="text" className="form-control" /></div>
+                {/* <div className="mt-3">
+                    <label className="form-label">Thể loại</label>
+                    <input onChange={(ev) => setid_the_loai(Number(ev.target.value))} type="text" className="form-control" /></div> */}
                 <div className="mt-3">
                     <label className="form-label">Thể loại</label>
-                    <input onChange={(ev) => setid_the_loai(Number(ev.target.value))} type="text" className="form-control" /></div>
+                    <SelectGenre onChange={setid_the_loai} />
+                </div>
                 <div className="mt-3">
-                    <label className="form-label">Phân loại</label>
-                    <input onChange={(ev) => setid_phan_loai(Number(ev.target.value))} type="text" className="form-control" /></div>
+                    <label className="form-label">Xếp hạng</label>
+                    <SelectRat onChange={setid_phan_loai} />
+                </div>
                 <div className="mt-3">
                     <label className="form-label">Ngày khởi chiếu</label>
                     <input onChange={(ev) => setngay_khoi_chieu(ev.target.value)} type="date" className="form-control" /></div>
