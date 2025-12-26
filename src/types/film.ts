@@ -9,3 +9,11 @@ export type FilmType = {
     ngay_khoi_chieu?: string;
     dang_chieu?: boolean;
 }
+export type FilmListItem = {
+    id: string;
+    ten_phim: string;
+    anh_gioi_thieu?: string;
+    mst_film_genres?: { ten_the_loai?: string } 
+    mst_film_ratings?: { ten_phan_loai?: string}
+    ngay_khoi_chieu?: string;
+} 

@@ -6,6 +6,7 @@ import ClientLayouts from './layouts/Client_layout.tsx';
 import Register from './pages/client/Register.tsx';
 import Login from './pages/client/Login.tsx';
 import FilmUpsert from './pages/admin/FilmUpsert.tsx';
+import Film from './pages/admin/Film.tsx';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route path='admin' element={<AdminLayouts />}>
             <Route path='room' element={<Room />}></Route>
             <Route path='film/create' element={<FilmUpsert />}></Route>
+            <Route path ='films' element ={<Film />}></Route>
           </Route>
           <Route element={<ClientLayouts />}>
             <Route path='dang_ky' element={<Register />}></Route>
@@ -24,6 +26,7 @@ function App() {
           <Route element={<ClientLayouts />}>
             <Route path='dang_nhap' element={<Login/>}></Route>
           </Route>
+          
         </Routes>
       </BrowserRouter>
     </>
