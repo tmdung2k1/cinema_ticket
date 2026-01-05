@@ -4,9 +4,15 @@ import type { RoomListItem } from "../../types/room";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppModal from "../../components/AppModal";
+import { useForm } from "react-hook-form";
+//xac thuc du lieu
+type Input = {
+    room_name: string;
+}
 
 function Room() {
     const [rooms, setRooms] = useState<RoomListItem[]>([]);
+    const { formState: { errors }, register, handleSubmit, setValue } = useForm<Input>();
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     // Modal state
@@ -15,6 +21,7 @@ function Room() {
     const [currentRoom, setCurrentRoom] = useState<{ id?: number; room_name: string }>({
         room_name: "",
     });
+
 
     // Load danh sách phòng
     async function loadRooms() {
@@ -28,25 +35,6 @@ function Room() {
             return;
         }
         setRooms(data as RoomListItem[]);
-    }
-
-    // Thêm phòng mới
-    async function addRoom() {
-        if (!currentRoom.room_name.trim()) {
-            alert("Vui lòng nhập tên phòng!");
-            return;
-        }
-
-        const { error } = await supabase
-            .from("rooms")
-            .insert({ room_name: currentRoom.room_name.trim() });
-
-        if (error) {
-            alert("Lỗi khi thêm phòng: " + error.message);
-        } else {
-            loadRooms();
-            closeModal();
-        }
     }
 
     // Mở modal sửa phòng
@@ -63,21 +51,18 @@ function Room() {
         }
 
         setCurrentRoom({ id: data.id, room_name: data.room_name || "" });
+        setValue("room_name", data.room_name || "");
         setModalMode("edit");
         setShowModal(true);
     }
 
     // Cập nhật phòng
-    async function updateRoom() {
-        if (!currentRoom.room_name.trim()) {
-            alert("Vui lòng nhập tên phòng!");
-            return;
-        }
+    async function updateRoom(roomName: string) {
         if (!currentRoom.id) return;
 
         const { error } = await supabase
             .from("rooms")
-            .update({ room_name: currentRoom.room_name.trim() })
+            .update({ room_name: roomName.trim() })
             .eq("id", currentRoom.id);
 
         if (error) {
@@ -85,6 +70,24 @@ function Room() {
         } else {
             loadRooms();
             closeModal();
+        }
+    }
+
+    // Xử lý submit form (thêm hoặc sửa)
+    async function onSubmit(data: Input) {
+        if (modalMode === "add") {
+            const { error } = await supabase
+                .from("rooms")
+                .insert({ room_name: data.room_name.trim() });
+
+            if (error) {
+                alert("Lỗi khi thêm phòng: " + error.message);
+            } else {
+                loadRooms();
+                closeModal();
+            }
+        } else {
+            await updateRoom(data.room_name);
         }
     }
 
@@ -106,12 +109,14 @@ function Room() {
     function closeModal() {
         setShowModal(false);
         setCurrentRoom({ room_name: "" });
+        setValue("room_name", "");
         setModalMode("add");
     }
 
     // Mở modal thêm mới
     function openAddModal() {
         setCurrentRoom({ room_name: "" });
+        setValue("room_name", "");
         setModalMode("add");
         setShowModal(true);
     }
@@ -136,6 +141,7 @@ function Room() {
             loadRooms();
         })();
     }, []);
+
 
     return (
         <>
@@ -214,30 +220,30 @@ function Room() {
                 onHide={closeModal}
                 headerText={modalMode === "add" ? "Thêm phòng mới" : "Cập nhật phòng"}>
                 <>
-                    <div className="mt-3">
-                        <label className="form-label fw-bold">Tên phòng</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={currentRoom.room_name}
-                            onChange={(e) =>
-                                setCurrentRoom({ ...currentRoom, room_name: e.target.value })//dau ... la de giu nguyen cac thuoc tinh khac cua currentRoom
-                            }
-                            placeholder="Nhập tên phòng..."
-                            autoFocus //khi mo ra thì con trỏ tự động ở trong input
-                        />
-                    </div>
-                    <div className="mt-4 d-flex justify-content-end gap-2">
-                        <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                            Hủy
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={modalMode === "add" ? addRoom : updateRoom}>
-                            {modalMode === "add" ? "Thêm mới" : "Cập nhật"}
-                        </button>
-                    </div>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mt-3">
+                            <label className="form-label fw-bold">Tên phòng</label>
+                            <input
+                                {...register("room_name", { required: "Tên phòng là bắt buộc" })}
+                                className="form-control"
+                                placeholder="Nhập tên phòng..."
+                                autoFocus
+                            />
+                            {errors.room_name && (
+                                <span className="text-danger">{errors.room_name.message}</span>
+                            )}
+                        </div>
+                        <div className="mt-4 d-flex justify-content-end gap-2">
+                            <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                                Hủy
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn btn-primary">
+                                {modalMode === "add" ? "Thêm Phòng" : "Cập Nhật"}
+                            </button>
+                        </div>
+                    </form>
                 </>
             </AppModal>
         </>
