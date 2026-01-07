@@ -12,11 +12,27 @@ import { yupResolver } from "@hookform/resolvers/yup"
 const schema = yup.object({
     ten_phim: yup.string().required("Tên phim là bắt buộc"),
     dao_dien: yup.string(),
-    anh_gioi_thieu: yup.mixed(),
-    trailer: yup.mixed().optional(),
+    anh_gioi_thieu: yup.mixed().test('anhGioiThieuMaxlength', 'Ảnh giới thiệu là bắt buộc', (value) => {
+        const files = value as FileList;
+        return files.length > 0;
+    }).test('filetype', 'Ảnh poster không hợp lệ', (value) => {
+        const files = value as FileList;
+        if (files.length == 0) return true; // Nếu không có file thì không kiểm tra loại file
+        const file = files[0];
+        // Kiểm tra loại file
+        const fileExt = file.name.split('.').pop() // Lấy phần mở rộng của file
+        return ['jpg', 'jpeg', 'png'].includes(fileExt ?? '');
+    }),
+    trailer: yup.mixed().test('trailerMaxlength', 'kích thước trailer không vượt quá 5MB', (value) => {
+        const files = value as FileList;
+        //kich thuoc khong vuot qua 5MB
+        if (files.length == 0) return true; // Nếu không có file thì không kiểm tra kích thước
+        const file = files[0];
+        return (file.size / (1024 * 1024)) <= 5; // 5MB
+    }),
     gioi_thieu_noi_dung: yup.string().optional(),
-    id_the_loai: yup.number().required("Thể loại là bắt buộc"),
-    id_phan_loai: yup.number().required("Phân loại là bắt buộc"),
+    id_the_loai: yup.number().min(1).required("Thể loại là bắt buộc"),
+    id_phan_loai: yup.number().min(1).required("Phân loại là bắt buộc"),
     ngay_khoi_chieu: yup.string().required("Ngày khởi chiếu là bắt buộc"),
     dang_chieu: yup.boolean().optional(),
 }).required();
@@ -123,11 +139,13 @@ function FilmUpsert() {
                     </div>
                     <div className="mt-3">
                         <label className="form-label">Ảnh giới thiệu</label>
-                        <input {...register("anh_gioi_thieu")} ref={anh_gioi_thieuRef} type="file" accept="image/*" className="form-control" />
+                        <input {...register("anh_gioi_thieu")} type="file" accept="image/*" className="form-control" />
+                        <p className="text-danger">{errors.anh_gioi_thieu?.message}</p>
                     </div>
                     <div className="mt-3">
                         <label className="form-label">Trailer</label>
-                        <input {...register("trailer")} ref={trailerRef} type="file" accept="video/*" className="form-control" />
+                        <input {...register("trailer")} type="file" accept="video/*" className="form-control" />
+                        <p className="text-danger">{errors.trailer?.message}</p>
                     </div>
                     <div className="mt-3">
                         <label className="form-label">Giới thiệu nội dung</label>
@@ -156,9 +174,9 @@ function FilmUpsert() {
                             name="id_phan_loai"
                             control={control}
                             render={({ field }) => (
-                            <SelectGenre
-                            onChange ={(value) => field.onChange(value)}
-                            />
+                                <SelectGenre
+                                    onChange={(value) => field.onChange(value)}
+                                />
                             )}
                         />
                         <p className="text-danger">{errors.id_phan_loai?.message}</p>
